@@ -199,3 +199,6 @@ FakesAssemblies/
 *.opt
 *.db
 *.opendb
+/input/kbfiltr/DvlErrLog.txt
+/input/kbfiltr/sys/RCa16560
+/input/kbfiltr/sys/RCb16560
