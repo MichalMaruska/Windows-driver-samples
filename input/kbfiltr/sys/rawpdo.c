@@ -67,7 +67,7 @@ Return Value:
     WDFDEVICE parent = WdfIoQueueGetDevice(Queue);
     PRPDO_DEVICE_DATA pdoData;
     WDF_REQUEST_FORWARD_OPTIONS forwardOptions;
-        
+
     pdoData = PdoGetData(parent);
 
     UNREFERENCED_PARAMETER(OutputBufferLength);
@@ -117,7 +117,7 @@ Return Value:
     NT Status code.
 
 --*/
-{   
+{
     NTSTATUS                    status;
     PWDFDEVICE_INIT             pDeviceInit = NULL;
     PRPDO_DEVICE_DATA           pdoData = NULL;
@@ -239,7 +239,7 @@ Return Value:
     }
 
     WdfPdoInitSetDefaultLocale(pDeviceInit, 0x409);
-    
+
     //
     // Initialize the attributes to specify the size of PDO device extension.
     // All the state information private to the PDO will be tracked here.
