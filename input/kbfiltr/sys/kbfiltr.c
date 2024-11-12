@@ -78,7 +78,7 @@ Return Value:
 
     DebugPrint(("Keyboard Filter Driver Sample - Driver Framework Edition.\n"));
     DebugPrint(("Built %s %s\n", __DATE__, __TIME__));
-
+    KdPrint(("mmc DriverEntry\n"));
     //
     // Initialize driver config to control the attributes that
     // are global to the driver. Note that framework by default
@@ -149,6 +149,7 @@ Return Value:
     UNREFERENCED_PARAMETER(Driver);
 
     PAGED_CODE();
+    KdPrint(("mmc add EVT"));
 
     DebugPrint(("Enter FilterEvtDeviceAdd \n"));
 
@@ -667,6 +668,7 @@ Return Value:
 
     devExt = (PDEVICE_EXTENSION)InitializationContext;
 
+    KdPrint(("mmc init\n"));
     //
     // Do any interesting processing here.  We just call any other drivers
     // in the chain if they exist.  Make sure Translation is turned on as well
@@ -743,6 +745,7 @@ Return Value:
 
     devExt = (PDEVICE_EXTENSION)IsrContext;
 
+    KdPrint(("mmc isr\n"));
     if (devExt->UpperIsrHook) {
         retVal = (*devExt->UpperIsrHook) (
                         devExt->UpperContext,
