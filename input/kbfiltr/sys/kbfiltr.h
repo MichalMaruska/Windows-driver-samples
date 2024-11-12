@@ -102,8 +102,14 @@ typedef struct _DEVICE_EXTENSION
     //
     KEYBOARD_ATTRIBUTES KeyboardAttributes;
 
+
+  //
+  LARGE_INTEGER CurrentTime;
+  WDFTIMER *Timer;
+
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
+// https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/wdf-object-attributes-init-context-type
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_EXTENSION,
                                         FilterGetData)
 

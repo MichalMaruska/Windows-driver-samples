@@ -252,11 +252,14 @@ Return Value:
     //
     status = KbFiltr_CreateRawPdo(hDevice, ++InstanceNo);
 
+    // mmc:
+    KeQuerySystemTime(&filterExt->CurrentTime);
+
     return status;
 }
 
 // https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/request-handlers
-//
+// ioctl on the pdo:
 VOID
 KbFilter_EvtIoDeviceControlFromRawPdo(
     IN WDFQUEUE      Queue,
@@ -760,7 +763,10 @@ Return Value:
 
     devExt = (PDEVICE_EXTENSION)IsrContext;
 
-    KdPrint(("mmc isr\n"));
+    LARGE_INTEGER CurrentTime;
+    KeQuerySystemTime(&CurrentTime); // ok?
+    KdPrint(("mmc isr at %lu\n", CurrentTime));
+
     if (devExt->UpperIsrHook) {
         retVal = (*devExt->UpperIsrHook) (
                         devExt->UpperContext,
@@ -824,6 +830,10 @@ Return Value:
     hDevice = WdfWdmDeviceGetWdfDeviceHandle(DeviceObject);
 
     devExt = FilterGetData(hDevice);
+
+    LARGE_INTEGER CurrentTime;
+    KeQuerySystemTime(&CurrentTime);
+    KdPrint(("service looking at %lu\n", CurrentTime));
 
     // mmc: here we pass up?
     (*(PSERVICE_CALLBACK_ROUTINE)(ULONG_PTR) devExt->UpperConnectData.ClassService)(
