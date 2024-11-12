@@ -354,6 +354,7 @@ Return Value:
     return;
 }
 
+// internal ioctl on the main queue.
 VOID
 KbFilter_EvtIoInternalDeviceControl(
     IN WDFQUEUE      Queue,
@@ -378,7 +379,7 @@ Routine Description:
         Add in the necessary function pointers and context values so that we can
         alter how the ps/2 keyboard is initialized.
 
-    NOTE:  Handling IOCTL_INTERNAL_I8042_HOOK_KEYBOARD is *NOT* necessary if
+    note:  Handling IOCTL_INTERNAL_I8042_HOOK_KEYBOARD is *NOT* necessary if
            all you want to do is filter KEYBOARD_INPUT_DATAs.  You can remove
            the handling code and all related device extension fields and
            functions to conserve space.
@@ -444,9 +445,9 @@ Return Value:
         // (Parameters.DeviceIoControl.Type3InputBuffer).
         //
         status = WdfRequestRetrieveInputBuffer(Request,
-                                    sizeof(CONNECT_DATA),
+                                    sizeof(CONNECT_DATA), /* min lenght.  type */
                                     &connectData,
-                                    &length);
+                                    &length); /* should be =< InputBufferLength */
         if(!NT_SUCCESS(status)){
             DebugPrint(("WdfRequestRetrieveInputBuffer failed %x\n", status));
             break;
@@ -454,17 +455,20 @@ Return Value:
 
         NT_ASSERT(length == InputBufferLength);
 
-        devExt->UpperConnectData = *connectData;
+        devExt->UpperConnectData = *connectData; /* the whole buffer. */
 
         //
         // Hook into the report chain.  Everytime a keyboard packet is reported
-        // to the system, KbFilter_ServiceCallback will be called
-        //
+        // to the system, `KbFilter_ServiceCallback' will be called
+        // mmc: nice!!!
 
+        // mmc: now we modify the buffer.
+        // we are the "ClassDevice" ?
         connectData->ClassDeviceObject = WdfDeviceWdmGetDeviceObject(hDevice);
 
 #pragma warning(disable:4152)  //nonstandard extension, function/data pointer conversion
 
+        // passing UP
         connectData->ClassService = KbFilter_ServiceCallback;
 
 #pragma warning(default:4152)
@@ -499,8 +503,8 @@ Return Value:
         // (Parameters.DeviceIoControl.Type3InputBuffer)
         //
         status = WdfRequestRetrieveInputBuffer(Request,
-                            sizeof(INTERNAL_I8042_HOOK_KEYBOARD),
-                            &hookKeyboard,
+                            sizeof(INTERNAL_I8042_HOOK_KEYBOARD), // mmc?
+                            &hookKeyboard, // who can give us this?
                             &length);
         if(!NT_SUCCESS(status)){
             DebugPrint(("WdfRequestRetrieveInputBuffer failed %x\n", status));
@@ -520,13 +524,14 @@ Return Value:
         //
         hookKeyboard->Context = (PVOID) devExt;
 
+        // `InitializationRoutine'
         if (hookKeyboard->InitializationRoutine) {
             devExt->UpperInitializationRoutine =
                 hookKeyboard->InitializationRoutine;
-        }
+        } // else it will be NULL?
         hookKeyboard->InitializationRoutine =
             (PI8042_KEYBOARD_INITIALIZATION_ROUTINE)
-            KbFilter_InitializationRoutine;
+            KbFilter_InitializationRoutine; // when used?
 
         if (hookKeyboard->IsrRoutine) {
             devExt->UpperIsrHook = hookKeyboard->IsrRoutine;
@@ -535,10 +540,10 @@ Return Value:
 
         //
         // Store all of the other important stuff
-        //
+        // mmc: but we don't modify that part:
         devExt->IsrWritePort = hookKeyboard->IsrWritePort;
-        devExt->QueueKeyboardPacket = hookKeyboard->QueueKeyboardPacket;
-        devExt->CallContext = hookKeyboard->CallContext;
+        devExt->QueueKeyboardPacket = hookKeyboard->QueueKeyboardPacket; // mmc: ??? function?
+        devExt->CallContext = hookKeyboard->CallContext; /* not used */
 
         status = STATUS_SUCCESS;
         break;
@@ -552,15 +557,17 @@ Return Value:
     //
     // Might want to capture these in the future.  For now, then pass them down
     // the stack.  These queries must be successful for the RIT to communicate
-    // with the keyboard.
+    // with the keyboard. mmc: RIT?
     //
     case IOCTL_KEYBOARD_QUERY_INDICATOR_TRANSLATION:
     case IOCTL_KEYBOARD_QUERY_INDICATORS:
     case IOCTL_KEYBOARD_SET_INDICATORS:
     case IOCTL_KEYBOARD_QUERY_TYPEMATIC:
     case IOCTL_KEYBOARD_SET_TYPEMATIC:
+      // mmc: why not: forwardWithCompletionRoutine = TRUE; .. b/c no completion needed!
         break;
-    }
+        // default?
+    } // switch
 
     if (!NT_SUCCESS(status)) {
         WdfRequestComplete(Request, status);
@@ -580,6 +587,7 @@ Return Value:
         // can access the return data in order to cache it into the context area
         //
 
+      // output_buffer:
         status = WdfRequestRetrieveOutputMemory(Request, &outputMemory);
 
         if (!NT_SUCCESS(status)) {
@@ -588,12 +596,16 @@ Return Value:
             return;
         }
 
+        // internal IOCTL?
         status = WdfIoTargetFormatRequestForInternalIoctl(WdfDeviceGetIoTarget(hDevice),
-                                                         Request,
+                                                          Request, // does this carry the output-buffer length?
                                                          IoControlCode,
+                                                          // input buffer
                                                          NULL,
                                                          NULL,
+                                                          // output
                                                          outputMemory,
+                                                          // offset.
                                                          NULL);
 
         if (!NT_SUCCESS(status)) {
@@ -607,6 +619,7 @@ Return Value:
         // the output data into
         //
         WdfRequestSetCompletionRoutine(Request,
+                                       // so call us back!
                                     KbFilterRequestCompletionRoutine,
                                     completionContext);
 
@@ -686,7 +699,9 @@ Return Value:
 
     devExt = (PDEVICE_EXTENSION)InitializationContext;
 
-    KdPrint(("mmc init\n"));
+    KdPrint(("mmc init, just proxy\n"));
+    // mmc: here we start, so init the forking machine?
+
     //
     // Do any interesting processing here.  We just call any other drivers
     // in the chain if they exist.  Make sure Translation is turned on as well
@@ -705,7 +720,7 @@ Return Value:
         }
     }
 
-    *TurnTranslationOn = TRUE;
+    *TurnTranslationOn = TRUE;  // mmc: why?
     return status;
 }
 
