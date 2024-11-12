@@ -295,7 +295,7 @@ Return Value:
 
     switch (IoControlCode) {
     case IOCTL_KBFILTR_GET_KEYBOARD_ATTRIBUTES:
-        
+
         //
         // Buffer is too small, fail the request
         //
@@ -304,13 +304,14 @@ Return Value:
             break;
         }
 
+        // output buffer:
         status = WdfRequestRetrieveOutputMemory(Request, &outputMemory);
-        
+
         if (!NT_SUCCESS(status)) {
             DebugPrint(("WdfRequestRetrieveOutputMemory failed %x\n", status));
             break;
         }
-        
+
         status = WdfMemoryCopyFromBuffer(outputMemory,
                                     0,
                                     &devExt->KeyboardAttributes,
@@ -322,13 +323,13 @@ Return Value:
         }
 
         bytesTransferred = sizeof(KEYBOARD_ATTRIBUTES);
-        
-        break;    
+
+        break;
     default:
         status = STATUS_NOT_IMPLEMENTED;
         break;
     }
-    
+
     WdfRequestCompleteWithInformation(Request, status, bytesTransferred);
 
     return;
@@ -528,7 +529,7 @@ Return Value:
         forwardWithCompletionRoutine = TRUE;
         completionContext = devExt;
         break;
-        
+
     //
     // Might want to capture these in the future.  For now, then pass them down
     // the stack.  These queries must be successful for the RIT to communicate
@@ -559,8 +560,8 @@ Return Value:
         // Format the request with the output memory so the completion routine
         // can access the return data in order to cache it into the context area
         //
-        
-        status = WdfRequestRetrieveOutputMemory(Request, &outputMemory); 
+
+        status = WdfRequestRetrieveOutputMemory(Request, &outputMemory);
 
         if (!NT_SUCCESS(status)) {
             DebugPrint(("WdfRequestRetrieveOutputMemory failed: 0x%x\n", status));
@@ -581,8 +582,8 @@ Return Value:
             WdfRequestComplete(Request, status);
             return;
         }
-    
-        // 
+
+        //
         // Set our completion routine with a context area that we will save
         // the output data into
         //
@@ -605,7 +606,7 @@ Return Value:
     {
 
         //
-        // We are not interested in post processing the IRP so 
+        // We are not interested in post processing the IRP so
         // fire and forget.
         //
         WDF_REQUEST_SEND_OPTIONS_INIT(&options,
@@ -618,7 +619,7 @@ Return Value:
             DebugPrint(("WdfRequestSend failed: 0x%x\n", status));
             WdfRequestComplete(Request, status);
         }
-        
+
     }
 
     return;
@@ -844,17 +845,17 @@ Return Value:
     NTSTATUS    status = CompletionParams->IoStatus.Status;
 
     UNREFERENCED_PARAMETER(Target);
- 
+
     //
     // Save the keyboard attributes in our context area so that we can return
     // them to the app later.
     //
-    if (NT_SUCCESS(status) && 
+    if (NT_SUCCESS(status) &&
         CompletionParams->Type == WdfRequestTypeDeviceControlInternal &&
         CompletionParams->Parameters.Ioctl.IoControlCode == IOCTL_KEYBOARD_QUERY_ATTRIBUTES) {
 
         if( CompletionParams->Parameters.Ioctl.Output.Length >= sizeof(KEYBOARD_ATTRIBUTES)) {
-            
+
             status = WdfMemoryCopyToBuffer(buffer,
                                            CompletionParams->Parameters.Ioctl.Output.Offset,
                                            &((PDEVICE_EXTENSION)Context)->KeyboardAttributes,
