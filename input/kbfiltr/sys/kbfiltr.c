@@ -284,7 +284,7 @@ Return Value:
 
     UNREFERENCED_PARAMETER(InputBufferLength);
 
-    DebugPrint(("Entered KbFilter_EvtIoInternalDeviceControl\n"));
+    DebugPrint(("Entered KbFilter_EvtIoDeviceControlFromRawPdo"));
 
     hDevice = WdfIoQueueGetDevice(Queue);
     devExt = FilterGetData(hDevice);
