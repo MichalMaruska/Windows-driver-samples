@@ -432,6 +432,7 @@ Return Value:
     // Connect a keyboard class device driver to the port driver.
     //
     case IOCTL_INTERNAL_KEYBOARD_CONNECT:
+        DebugPrint(("IOCTL_INTERNAL_KEYBOARD_CONNECT\n"));
         //
         // Only allow one connection.
         //
