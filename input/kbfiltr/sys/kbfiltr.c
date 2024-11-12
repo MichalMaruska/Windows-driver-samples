@@ -109,6 +109,7 @@ Return Value:
     return status;
 }
 
+// https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdriver/nc-wdfdriver-evt_wdf_driver_device_add
 NTSTATUS
 KbFilter_EvtDeviceAdd(
     IN WDFDRIVER        Driver,
@@ -159,10 +160,16 @@ Return Value:
     // from the lower device you are attaching to.
     //
     WdfFdoInitSetFilter(DeviceInit);
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdffdo/nf-wdffdo-wdffdoinitsetfilter
 
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfdevice/nf-wdfdevice-wdfdeviceinitsetdevicetype
     WdfDeviceInitSetDeviceType(DeviceInit, FILE_DEVICE_KEYBOARD);
 
+    // stack allocated deviceAttributes
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/wdf-object-attributes-init-context-type
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_EXTENSION);
+
+
 
     //
     // Create a framework device object.  This call will in turn create
@@ -175,7 +182,8 @@ Return Value:
         return status;
     }
 
-    // mmc: WDF_DECLARE_CONTEXT_TYPE_WITH_NAME macro this 
+    // mmc: WDF_DECLARE_CONTEXT_TYPE_WITH_NAME macro this
+    // mmc: as we asked in the WDF_DECLARE_CONTEXT_TYPE_WITH_NAME macro:
     filterExt = FilterGetData(hDevice);
 
     //
@@ -185,14 +193,15 @@ Return Value:
     // receives an ioctl request and waits for it to be completed. If you use a
     // a sequential queue, this request will be stuck in the queue because of the 
     // outstanding ioctl request sent earlier to the port driver.
-    //
+    // mmc: queue for ioctl (from User-Space originated)
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&ioQueueConfig,
                              WdfIoQueueDispatchParallel);
 
     //
     // Framework by default creates non-power managed queues for
     // filter drivers.
-    //
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/request-handlers
+    // mmc: internal ioctl .... what is the difference?
     ioQueueConfig.EvtIoInternalDeviceControl = KbFilter_EvtIoInternalDeviceControl;
 
     status = WdfIoQueueCreate(hDevice,
@@ -207,27 +216,29 @@ Return Value:
 
     //
     // Create a new queue to handle IOCTLs that will be forwarded to us from
-    // the rawPDO. 
-    //
+    // the `rawPDO'.
+    // we recycle the struct:
     WDF_IO_QUEUE_CONFIG_INIT(&ioQueueConfig,
                              WdfIoQueueDispatchParallel);
 
     //
     // Framework by default creates non-power managed queues for
     // filter drivers.
-    //
+    // mmc: ioctl
     ioQueueConfig.EvtIoDeviceControl = KbFilter_EvtIoDeviceControlFromRawPdo;
 
+    // another queue,
     status = WdfIoQueueCreate(hDevice,
                             &ioQueueConfig,
-                            WDF_NO_OBJECT_ATTRIBUTES,
-                            &hQueue
+                            WDF_NO_OBJECT_ATTRIBUTES, // mmc: ??
+                            &hQueue     // we get it, and then?
                             );
     if (!NT_SUCCESS(status)) {
         DebugPrint( ("WdfIoQueueCreate failed 0x%x\n", status));
         return status;
     }
 
+    // store in the extension:
     filterExt->rawPdoQueue = hQueue;
 
     //
@@ -244,13 +255,16 @@ Return Value:
     return status;
 }
 
+// https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/request-handlers
+//
 VOID
 KbFilter_EvtIoDeviceControlFromRawPdo(
     IN WDFQUEUE      Queue,
     IN WDFREQUEST    Request,
+    // mmc: where is the buffer?
     IN size_t        OutputBufferLength,
     IN size_t        InputBufferLength,
-    IN ULONG         IoControlCode
+    IN ULONG         IoControlCode  // voila'
     )
 /*++
 
@@ -288,8 +302,8 @@ Return Value:
 
     DebugPrint(("Entered KbFilter_EvtIoDeviceControlFromRawPdo"));
 
-    hDevice = WdfIoQueueGetDevice(Queue);
-    devExt = FilterGetData(hDevice);
+    hDevice = WdfIoQueueGetDevice(Queue); //
+    devExt = FilterGetData(hDevice); // mmc:
 
     //
     // Process the ioctl and complete it when you are done.
