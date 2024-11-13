@@ -295,7 +295,7 @@ void KbFilter_EvtWdfTimer(IN WDFTIMER Timer) {
     LARGE_INTEGER CurrentTime;
     KeQuerySystemTime(&CurrentTime);
 
-    KdPrint(("%s %lu\n", __func__, miliseconds_of(CurrentTime)));
+    // KdPrint(("%s %lu\n", __func__, miliseconds_of(CurrentTime)));
     KdPrint(("%s %ld\n", __func__, miliseconds_of(CurrentTime) - devExt->lastEventTime ));
 }
 
