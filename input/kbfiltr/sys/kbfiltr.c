@@ -265,7 +265,8 @@ Return Value:
 
     WDF_OBJECT_ATTRIBUTES timerAttributes;
     WDF_OBJECT_ATTRIBUTES_INIT(&timerAttributes);
-// EVT_WDF_TIMER EvtWdfTimer;
+    timerAttributes.ParentObject = hDevice;
+
     status = WdfTimerCreate(&Time_Config,
                             &timerAttributes,
                             &filterExt->timerHandle);
