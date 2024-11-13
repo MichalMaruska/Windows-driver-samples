@@ -907,13 +907,24 @@ Return Value:
                 ));
     };
 
+    if (event->MakeCode > 255) {
+        // USHORT MakeCode;
+        event->MakeCode = 0;
+    }
+
     if (InputDataStart->Flags == 0) {
+        devExt->duration[event->MakeCode] = devExt->lastEventTime;
+
         // start the timer
         LONGLONG DueTime = - 100 * 1000 * 10; // 10 microseconds, 1000 miliseconds , 100 of them.
         // negative: relative to now.
 
         BOOLEAN already = WdfTimerStart(devExt->timerHandle, DueTime);
         KdPrint(("timer start in %ld: %s\n", DueTime, already?"already":"new"));
+    } else if (InputDataStart->Flags == 1) {
+
+        KdPrint(("key %d was pressed %lu\n", event->MakeCode,
+                 devExt->lastEventTime - devExt->duration[event->MakeCode]));
     }
 
     // mmc: here we pass up?

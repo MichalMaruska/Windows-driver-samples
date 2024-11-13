@@ -106,6 +106,7 @@ typedef struct _DEVICE_EXTENSION
   //
   LARGE_INTEGER CurrentTime;
   long lastEventTime;
+  int duration[256];
   WDFTIMER  timerHandle;
 
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
