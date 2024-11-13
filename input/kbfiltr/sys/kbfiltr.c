@@ -863,7 +863,11 @@ Return Value:
 
     for (event = InputDataStart; event != InputDataEnd; event++) {
         KdPrint(("event %u %s\n", event->MakeCode,
-                 (event->Flags & KEY_MAKE)?"Press": (event->Flags & KEY_BREAK)?"Release":"unknown"
+                 (event->Flags & KEY_MAKE)?"Press"
+                 :(event->Flags & KEY_BREAK)?"Release"
+                 :(event->Flags & KEY_E0)?"E0"
+                 :(event->Flags & KEY_E1)?"E1"
+                 :"unknown"
                 ));
     }
 
