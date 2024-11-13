@@ -105,7 +105,9 @@ typedef struct _DEVICE_EXTENSION
 
   //
   LARGE_INTEGER CurrentTime;
+  long lastEventTime;
   WDFTIMER  timerHandle;
+
 } DEVICE_EXTENSION, *PDEVICE_EXTENSION;
 
 // https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/wdf-object-attributes-init-context-type

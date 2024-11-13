@@ -280,10 +280,16 @@ Return Value:
 }
 
 void KbFilter_EvtWdfTimer(IN WDFTIMER Timer) {
-    UNREFERENCED_PARAMETER(Timer);
 
-    KdPrint(("%s\n", __func__));
-    DebugPrint(("%s\n", __func__));
+    // UNREFERENCED_PARAMETER(Timer);
+    WDFOBJECT hDevice =  WdfTimerGetParentObject(Timer);
+    PDEVICE_EXTENSION devExt = FilterGetData(hDevice);
+
+    LARGE_INTEGER CurrentTime;
+    KeQuerySystemTime(&CurrentTime);
+
+    KdPrint(("%s %lu\n", __func__, miliseconds_of(CurrentTime)));
+    KdPrint(("%s %ld\n", __func__, miliseconds_of(CurrentTime) - devExt->lastEventTime ));
 }
 
 
@@ -886,8 +892,9 @@ Return Value:
 
     LARGE_INTEGER CurrentTime;
     KeQuerySystemTime(&CurrentTime);
+    devExt->lastEventTime = miliseconds_of(CurrentTime);
 
-    KdPrint(("service looking at %lu\n", miliseconds_of(CurrentTime)));
+    KdPrint(("service looking at %lu\n", devExt->lastEventTime));
     KdPrint(("service looking at %lu events\n", (long) InputDataEnd - InputDataStart)); // reduce.
 
     const char* keyflag[4] = {"Press","Release","E0", "E1"};
