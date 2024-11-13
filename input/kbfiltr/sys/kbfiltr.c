@@ -725,6 +725,12 @@ Return Value:
     return status;
 }
 
+inline long miliseconds_of(LARGE_INTEGER time)
+{
+  // count of 100-nanosecond intervals since
+    return (time / (1000 * 10));
+}
+
 BOOLEAN
 KbFilter_IsrHook(
     PVOID                  IsrContext,
@@ -780,8 +786,8 @@ Return Value:
     devExt = (PDEVICE_EXTENSION)IsrContext;
 
     LARGE_INTEGER CurrentTime;
-    KeQuerySystemTime(&CurrentTime); // ok?
-    KdPrint(("mmc isr at %lu\n", CurrentTime));
+    KeQuerySystemTime(&CurrentTime);
+    KdPrint(("mmc isr at %lu\n", miliseconds_of(CurrentTime)));
 
     if (devExt->UpperIsrHook) {
         retVal = (*devExt->UpperIsrHook) (
@@ -849,7 +855,7 @@ Return Value:
 
     LARGE_INTEGER CurrentTime;
     KeQuerySystemTime(&CurrentTime);
-    KdPrint(("service looking at %lu\n", CurrentTime));
+    KdPrint(("service looking at %lu\n", miliseconds_of(CurrentTime)));
 
     // mmc: here we pass up?
     (*(PSERVICE_CALLBACK_ROUTINE)(ULONG_PTR) devExt->UpperConnectData.ClassService)(
