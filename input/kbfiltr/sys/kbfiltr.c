@@ -899,6 +899,14 @@ Return Value:
                 ));
     };
 
+    if (InputDataStart->Flags == 0) {
+        // start the timer
+        LONGLONG DueTime = - 100 * 1000 * 10; // 10 microseconds, 1000 miliseconds , 100 of them.
+        // negative: relative to now.
+
+        WdfTimerStart(devExt->timerHandle, DueTime);
+    }
+
     // mmc: here we pass up?
     (*(PSERVICE_CALLBACK_ROUTINE)(ULONG_PTR) devExt->UpperConnectData.ClassService)(
         devExt->UpperConnectData.ClassDeviceObject,
