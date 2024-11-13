@@ -279,6 +279,13 @@ Return Value:
     return status;
 }
 
+inline long miliseconds_of(LARGE_INTEGER time)
+{
+  // count of 100-nanosecond intervals since
+    __int64 t = time.QuadPart;
+    return (long) ( t / (1000 * 10));
+}
+
 void KbFilter_EvtWdfTimer(IN WDFTIMER Timer) {
 
     // UNREFERENCED_PARAMETER(Timer);
@@ -758,13 +765,6 @@ Return Value:
 
     *TurnTranslationOn = TRUE;  // mmc: why?
     return status;
-}
-
-inline long miliseconds_of(LARGE_INTEGER time)
-{
-  // count of 100-nanosecond intervals since
-    __int64 t = time.QuadPart;
-    return (long) ( t / (1000 * 10));
 }
 
 BOOLEAN
