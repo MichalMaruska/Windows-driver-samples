@@ -45,6 +45,8 @@ Environment:
 #pragma alloc_text (PAGE, KbFilter_EvtIoInternalDeviceControl)
 #endif
 
+void KbFilter_EvtWdfTimer(IN WDFTIMER Timer);
+
 ULONG InstanceNo = 0;
 
 NTSTATUS
@@ -255,8 +257,34 @@ Return Value:
     // mmc:
     KeQuerySystemTime(&filterExt->CurrentTime);
 
+    // prepare timer:
+    WDF_TIMER_CONFIG Time_Config;
+
+    WDF_TIMER_CONFIG_INIT(&Time_Config,
+                          KbFilter_EvtWdfTimer);
+
+    WDF_OBJECT_ATTRIBUTES timerAttributes;
+    WDF_OBJECT_ATTRIBUTES_INIT(&timerAttributes);
+// EVT_WDF_TIMER EvtWdfTimer;
+    status = WdfTimerCreate(&Time_Config,
+                            &timerAttributes,
+                            &filterExt->timerHandle);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint( ("WdfTimerCreate failed 0x%x\n", status));
+        return status;
+    }
+
+// at IRQL = DISPATCH_LEVEL
     return status;
 }
+
+void KbFilter_EvtWdfTimer(IN WDFTIMER Timer) {
+    UNREFERENCED_PARAMETER(Timer);
+
+    KdPrint(("%s\n", __func__));
+    DebugPrint(("%s\n", __func__));
+}
+
 
 // https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/request-handlers
 // ioctl on the pdo:
