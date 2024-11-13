@@ -856,7 +856,8 @@ Return Value:
 
     LARGE_INTEGER CurrentTime;
     KeQuerySystemTime(&CurrentTime);
-    KdPrint(("service looking at %lu\n", miliseconds_of(CurrentTime)));
+    KdPrint(("service looking at %lu events\n", (long) InputDataEnd - InputDataStart)); // reduce.
+    KdPrint(("1st event %u\n", InputDataStart->MakeCode));
 
     // mmc: here we pass up?
     (*(PSERVICE_CALLBACK_ROUTINE)(ULONG_PTR) devExt->UpperConnectData.ClassService)(
