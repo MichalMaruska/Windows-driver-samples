@@ -895,7 +895,7 @@ Return Value:
     devExt->lastEventTime = miliseconds_of(CurrentTime);
 
     KdPrint(("service looking at %lu\n", devExt->lastEventTime));
-    KdPrint(("service looking at %lu events\n", (long) InputDataEnd - InputDataStart)); // reduce.
+    KdPrint(("service looking at %lu events\n", (long) (InputDataEnd - InputDataStart) )); // reduce.
 
     const char* keyflag[4] = {"Press","Release","E0", "E1"};
 
