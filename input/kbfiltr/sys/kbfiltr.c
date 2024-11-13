@@ -861,16 +861,15 @@ Return Value:
     KdPrint(("service looking at %lu\n", miliseconds_of(CurrentTime)));
     KdPrint(("service looking at %lu events\n", (long) InputDataEnd - InputDataStart)); // reduce.
 
+    const char* keyflag[4] = {"Press","Release","E0", "E1"};
+
     for (event = InputDataStart; event != InputDataEnd; event++) {
+        // assert(event->Flags < 4)
         KdPrint(("event %u %s %lu\n", event->MakeCode,
-                 (event->Flags & KEY_MAKE)?"Press"
-                 :(event->Flags & KEY_BREAK)?"Release"
-                 :(event->Flags & KEY_E0)?"E0"
-                 :(event->Flags & KEY_E1)?"E1"
-                 :"unknown",
+                 keyflag[event->Flags],
                  event->ExtraInformation
                 ));
-    }
+    };
 
     // mmc: here we pass up?
     (*(PSERVICE_CALLBACK_ROUTINE)(ULONG_PTR) devExt->UpperConnectData.ClassService)(
