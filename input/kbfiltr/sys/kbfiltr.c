@@ -894,10 +894,13 @@ Return Value:
     KeQuerySystemTime(&CurrentTime);
     devExt->lastEventTime = miliseconds_of(CurrentTime);
 
-    KdPrint(("service looking at %lu\n", devExt->lastEventTime));
-    KdPrint(("service looking at %lu events\n", (long) (InputDataEnd - InputDataStart) )); // reduce.
+    // c++ 17 ?
+    long count = (long) (InputDataEnd - InputDataStart); // reduce.
+    if (count>1) {
+        KdPrint(("service looking at %lu events\n", count ));
+    }
 
-    const char* keyflag[4] = {"Press","Release","E0", "E1"};
+    static const char* keyflag[4] = {"Press","Release","E0", "E1"};
 
     for (event = InputDataStart; event != InputDataEnd; event++) {
         // assert(event->Flags < 4)
