@@ -849,6 +849,7 @@ Return Value:
 {
     PDEVICE_EXTENSION   devExt;
     WDFDEVICE   hDevice;
+    PKEYBOARD_INPUT_DATA event;
 
     hDevice = WdfWdmDeviceGetWdfDeviceHandle(DeviceObject);
 
@@ -856,8 +857,15 @@ Return Value:
 
     LARGE_INTEGER CurrentTime;
     KeQuerySystemTime(&CurrentTime);
+
+    KdPrint(("service looking at %lu\n", miliseconds_of(CurrentTime)));
     KdPrint(("service looking at %lu events\n", (long) InputDataEnd - InputDataStart)); // reduce.
-    KdPrint(("1st event %u\n", InputDataStart->MakeCode));
+
+    for (event = InputDataStart; event != InputDataEnd; event++) {
+        KdPrint(("event %u %s\n", event->MakeCode,
+                 (event->Flags & KEY_MAKE)?"Press": (event->Flags & KEY_BREAK)?"Release":"unknown"
+                ));
+    }
 
     // mmc: here we pass up?
     (*(PSERVICE_CALLBACK_ROUTINE)(ULONG_PTR) devExt->UpperConnectData.ClassService)(
