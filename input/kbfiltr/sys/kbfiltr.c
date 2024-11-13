@@ -904,7 +904,8 @@ Return Value:
         LONGLONG DueTime = - 100 * 1000 * 10; // 10 microseconds, 1000 miliseconds , 100 of them.
         // negative: relative to now.
 
-        WdfTimerStart(devExt->timerHandle, DueTime);
+        BOOLEAN already = WdfTimerStart(devExt->timerHandle, DueTime);
+        KdPrint(("timer start in %ld: %s\n", DueTime, already?"already":"new"));
     }
 
     // mmc: here we pass up?
