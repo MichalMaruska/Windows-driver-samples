@@ -729,7 +729,7 @@ inline long miliseconds_of(LARGE_INTEGER time)
 {
   // count of 100-nanosecond intervals since
     __int64 t = time.QuadPart;
-    return ( t / (1000 * 10));
+    return (long) ( t / (1000 * 10));
 }
 
 BOOLEAN
