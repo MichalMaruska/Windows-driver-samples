@@ -862,12 +862,13 @@ Return Value:
     KdPrint(("service looking at %lu events\n", (long) InputDataEnd - InputDataStart)); // reduce.
 
     for (event = InputDataStart; event != InputDataEnd; event++) {
-        KdPrint(("event %u %s\n", event->MakeCode,
+        KdPrint(("event %u %s %lu\n", event->MakeCode,
                  (event->Flags & KEY_MAKE)?"Press"
                  :(event->Flags & KEY_BREAK)?"Release"
                  :(event->Flags & KEY_E0)?"E0"
                  :(event->Flags & KEY_E1)?"E1"
-                 :"unknown"
+                 :"unknown",
+                 event->ExtraInformation
                 ));
     }
 
