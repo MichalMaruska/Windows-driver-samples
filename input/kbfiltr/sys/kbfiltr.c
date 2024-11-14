@@ -823,8 +823,9 @@ Return Value:
 
     LARGE_INTEGER CurrentTime;
     KeQuerySystemTime(&CurrentTime);
+#if 0
     KdPrint(("mmc isr at %lu\n", miliseconds_of(CurrentTime)));
-
+#endif
     if (devExt->UpperIsrHook) {
         retVal = (*devExt->UpperIsrHook) (
                         devExt->UpperContext,
