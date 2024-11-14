@@ -845,6 +845,21 @@ Return Value:
     return retVal;
 }
 
+BOOLEAN
+startTimer(WDFTIMER timerHandle)
+{
+  int miliseconds = 120;
+  LONGLONG DueTime = - miliseconds * 1000 * 10; // 10 microseconds, 1000 miliseconds , 100 of them.
+  // negative: relative to now.
+
+  BOOLEAN already = WdfTimerStart(timerHandle, DueTime);
+  if (already) {
+    KdPrint(("timer start in %ld: %s\n", DueTime, already?"already":"new"));
+  }
+  return already;
+}
+
+
 VOID
 KbFilter_ServiceCallback(
     IN PDEVICE_OBJECT  DeviceObject,
@@ -918,12 +933,7 @@ Return Value:
         if (event->Flags == 0) {
             devExt->duration[keycode] = devExt->lastEventTime;
 
-            // start the timer
-            LONGLONG DueTime = - 100 * 1000 * 10; // 10 microseconds, 1000 miliseconds , 100 of them.
-            // negative: relative to now.
-
-            BOOLEAN already = WdfTimerStart(devExt->timerHandle, DueTime);
-            KdPrint(("timer start in %ld: %s\n", DueTime, already?"already":"new"));
+            startTimer(devExt->timerHandle);
         } else if (InputDataStart->Flags == 1) {
 
             KdPrint(("key %u was pressed %lu\n", keycode,
