@@ -286,6 +286,7 @@ inline long miliseconds_of(LARGE_INTEGER time)
     return (long) ( t / (1000 * 10) % (3600 * 1000)); // inside 1 hour
 }
 
+// https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/using-timers
 void KbFilter_EvtWdfTimer(IN WDFTIMER Timer) {
 
     // UNREFERENCED_PARAMETER(Timer);
@@ -1017,35 +1018,5 @@ Return Value:
 void KeQuerySystemTime(
   [out] PLARGE_INTEGER CurrentTime
 );
-
-
-
-// https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/using-timers
-// Create a timer:
-WDF_TIMER_CONFIG Time_Config;
-
-WDF_TIMER_CONFIG_INIT(
-                      PWDF_TIMER_CONFIG Config,
-                      _in_ PFN_WDF_TIMER EvtTimerFunc);
-
-//  WdfTimerCreate()
-WDF_OBJECT_ATTRIBUTES timerAttributes;
-
-// EVT_WDF_TIMER EvtWdfTimer;
-NTSTATUS WdfTimerCreate(
-  _IN_  PWDF_TIMER_CONFIG      Config,
-  _IN_  PWDF_OBJECT_ATTRIBUTES Attributes,
-  _OUT_ WDFTIMER               *Timer
-);
-
-
-// at IRQL = DISPATCH_LEVEL
-void EvtWdfTimer(
-  _in_ WDFTIMER Timer
-                 ) {
-  // push_time
-
-}
-
 
 #endif
