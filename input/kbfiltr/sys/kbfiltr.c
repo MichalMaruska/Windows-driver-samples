@@ -937,8 +937,9 @@ Return Value:
 
             startTimer(devExt->timerHandle);
         } else if (InputDataStart->Flags == 1) {
+            WdfTimerStop(devExt->timerHandle, FALSE);
 
-            KdPrint(("key %u was pressed %lu\n", keycode,
+            KdPrint(("key %u was pressed %lumS\n", keycode,
                      devExt->lastEventTime - devExt->duration[keycode]));
         }
     }
