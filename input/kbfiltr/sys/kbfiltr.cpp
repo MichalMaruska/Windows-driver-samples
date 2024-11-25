@@ -415,7 +415,7 @@ inline long current_time_miliseconds()
     LARGE_INTEGER CurrentTime;
     KeQuerySystemTime(&CurrentTime);
     // count of 100-nanosecond intervals since
-    __int64 t = CurrentTime.QuadPart;
+    __int64 &t = CurrentTime.QuadPart;
     return (long) ( t / (1000 * 10) % (3600 * 1000)); // inside 1 hour
 }
 
