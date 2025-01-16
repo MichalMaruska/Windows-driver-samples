@@ -141,7 +141,13 @@ static ALLOC_SECTION_LDATA VSC_VK aE1VscToVk[] = {
 static ALLOC_SECTION_LDATA VK_TO_BIT aVkToBits[] = {
     { VK_SHIFT    ,   KBDSHIFT     },
     { VK_CONTROL  ,   KBDCTRL      },
+#if 0
     { VK_MENU     ,   KBDALT       },
+#else
+    // I want these Virtual keys:
+    { VK_RMENU  ,   KBDCTRL      },
+    { VK_LMENU     ,   KBDALT       },
+#endif
     { 0           ,   0           }
 };
 
