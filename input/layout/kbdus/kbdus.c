@@ -84,7 +84,8 @@ static ALLOC_SECTION_LDATA USHORT ausVK[] = {
 static ALLOC_SECTION_LDATA VSC_VK aE0VscToVk[] = {
         { 0x10, X10 | KBDEXT              },  // Speedracer: Previous Track
         { 0x19, X19 | KBDEXT              },  // Speedracer: Next Track
-        { 0x1D, X1D | KBDEXT              },  // RControl
+        { 0x1D, X38 | KBDEXT              }, // RMenu
+        // X1D RControl
         { 0x20, X20 | KBDEXT              },  // Speedracer: Volume Mute
         { 0x21, X21 | KBDEXT              },  // Speedracer: Launch App 2
         { 0x22, X22 | KBDEXT              },  // Speedracer: Media Play/Pause
@@ -94,7 +95,9 @@ static ALLOC_SECTION_LDATA VSC_VK aE0VscToVk[] = {
         { 0x32, X32 | KBDEXT              },  // Speedracer: Browser Home
         { 0x35, X35 | KBDEXT              },  // Numpad Divide
         { 0x37, X37 | KBDEXT              },  // Snapshot
-        { 0x38, X38 | KBDEXT              },  // RMenu
+
+        { 0x38, X1D | KBDEXT              },  // RCONTROL
+        // X38  RMenu ...
         { 0x47, X47 | KBDEXT              },  // Home
         { 0x48, X48 | KBDEXT              },  // Up
         { 0x49, X49 | KBDEXT              },  // Prior
